@@ -1,6 +1,9 @@
 from functions.get_files_info import get_files_info
 
 
+# Truthfully the way I did this page was way different
+# but still worked. After passing the lessons I looked at the
+# solution files and thought this was so much better. The other two pages were grammar fixes.
 def test() -> None:
     result = get_files_info("calculator", ".")
     print("Result for current directory:")

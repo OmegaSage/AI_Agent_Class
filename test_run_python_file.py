@@ -22,7 +22,7 @@ def test() -> None:
     print(result)
     print("")
 
-    result = run_python_file("calculator", "nonexistant.py")
+    result = run_python_file("calculator", "nonexistent.py")
     print("Result for nonexistant.py")
     print(result)
     print("")

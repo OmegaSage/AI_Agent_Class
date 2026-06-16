@@ -1,7 +1,5 @@
 import os
 import subprocess
-from operator import not_
-from sys import stderr
 
 
 def run_python_file(
@@ -23,23 +21,15 @@ def run_python_file(
         result = subprocess.run(
             command, text=True, capture_output=True, timeout=30, cwd=working_dir_abs
         )
-        output: str = ""
+        output: list[str] = []
         if result.returncode != 0:
-            output += f"Process exited with code {result.returncode}"
-            print(output, "TEST1")
-        if result.stderr == None:
-            if result.stdout == None:
-                output += "No output produced"
-                print(output, "TEST2")
-            elif result.stdout != None:
-                output += f"STDOUT: {result.stdout}"
-                print(output, "TEST3")
-        elif result.stderr != None:
-            output += f"STDERR: {result.stderr}"
-            print(output, "TEST4")
-        return output
-
-    except subprocess.CalledProcessError as t:
-        return f"Process exited with code {t.returncode}"
+            output.append(f"Process exited with code {result.returncode}")
+        if not result.stderr and not result.stdout:
+            output.append("No output produced")
+        if result.stdout:
+            output.append(f"STDOUT:\n{result.stdout}")
+        if result.stderr:
+            output.append(f"STDERR:\n{result.stderr}")
+        return "\n".join(output)
     except Exception as e:
         return f"Error: executing Python file: {e}"

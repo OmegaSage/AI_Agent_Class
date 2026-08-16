@@ -1,2 +1,2 @@
 # how many characters we want to read from get_file_content
-chars = 10000
+MAX_CHARS = 10000

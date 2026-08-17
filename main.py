@@ -5,7 +5,7 @@ import json
 from prompts import system_prompt
 from dotenv import load_dotenv
 from openai import OpenAI
-from functions.call_function import available_functions
+from call_function import available_functions
 
 
 def main() -> None:
@@ -54,13 +54,6 @@ def generate_content(client: OpenAI, messages: list, verbose: bool) -> None:
         print("Response tokens:", response.usage.completion_tokens)
     print("Response:")
     print(response.choices[0].message.content)
-
-    #if not messages.tool_call:
-        #raise RuntimeError("No function calls were made.")
-
-    #for tool_call in messages.tool_calls:
-        #function_args = json.loads(tool_call.function.arguments or "{}")
-        #print(f"Calling function: {tool_call.function.name}({function_args})")
 
 if __name__ == "__main__":
     main()

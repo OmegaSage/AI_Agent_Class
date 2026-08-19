@@ -1,11 +1,12 @@
 import argparse
+from logging import raiseExceptions
 import os
 import json
 
 from prompts import system_prompt
 from dotenv import load_dotenv
 from openai import OpenAI
-from call_function import available_functions
+from call_function import available_functions, call_function
 
 
 def main() -> None:
@@ -44,10 +45,14 @@ def generate_content(client: OpenAI, messages: list, verbose: bool) -> None:
         raise RuntimeError("API response appears to be malformed")
 
     message = response.choices[0].message
+
     if message.tool_calls:
-        for tool_call in message.tool_calls:
-            function_args = json.loads(tool_call.function.arguments or "{}")
-            print(f"Calling function: {tool_call.function.name}({function_args})")
+        for tool in message.tool_calls:
+            result_message = call_function(tool)
+            if not result_message["content"]:
+                raise Exception("Not a valid function")
+            if verbose:
+                print(f"-> {result_message['content']}")
 
     if verbose:
         print("Prompt tokens:", response.usage.prompt_tokens)

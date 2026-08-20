@@ -35,30 +35,33 @@ def main() -> None:
 
 
 def generate_content(client: OpenAI, messages: list, verbose: bool) -> None:
-    response = client.chat.completions.create(
-        model="openrouter/free",
-        messages=messages,
-        tools=available_functions,
-        #temperature=0, #sets responses to explisive
-    )
-    if not response.usage:
-        raise RuntimeError("API response appears to be malformed")
+    for _ in range(20):
+        # call the model, handle responses, etc.
+        response = client.chat.completions.create(
+            model="openrouter/free",
+            messages=messages,
+            tools=available_functions,
+            #temperature=0, #sets responses to explisive
+        )
+        if not response.usage:
+            raise RuntimeError("API response appears to be malformed")
 
-    message = response.choices[0].message
+        message = response.choices[0].message
+        messages.append(message)
 
-    if message.tool_calls:
-        for tool in message.tool_calls:
-            result_message = call_function(tool)
-            if not result_message["content"]:
-                raise Exception("Not a valid function")
-            if verbose:
-                print(f"-> {result_message['content']}")
+        if message.tool_calls:
+            for tool in message.tool_calls:
+                result_message = call_function(tool)
+                if not result_message["content"]:
+                    raise Exception("Not a valid function")
+                if verbose:
+                    print(f"-> {result_message['content']}")
 
-    if verbose:
-        print("Prompt tokens:", response.usage.prompt_tokens)
-        print("Response tokens:", response.usage.completion_tokens)
-    print("Response:")
-    print(response.choices[0].message.content)
+        if verbose:
+            print("Prompt tokens:", response.usage.prompt_tokens)
+            print("Response tokens:", response.usage.completion_tokens)
+        print("Response:")
+        print(response.choices[0].message.content)
 
 if __name__ == "__main__":
     main()

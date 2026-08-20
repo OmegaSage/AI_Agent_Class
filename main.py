@@ -1,7 +1,6 @@
 import argparse
-from logging import raiseExceptions
 import os
-import json
+import sys
 
 from prompts import system_prompt
 from dotenv import load_dotenv
@@ -52,16 +51,23 @@ def generate_content(client: OpenAI, messages: list, verbose: bool) -> None:
         if message.tool_calls:
             for tool in message.tool_calls:
                 result_message = call_function(tool)
-                if not result_message["content"]:
-                    raise Exception("Not a valid function")
+                if not result_message.get("content"):
+                    raise RuntimeError(f"Empty function response for {tool.function.name}")
+                messages.append(result_message)
                 if verbose:
                     print(f"-> {result_message['content']}")
+        else:
+            print("Response:")
+            print(message.content)
+            break
 
-        if verbose:
-            print("Prompt tokens:", response.usage.prompt_tokens)
-            print("Response tokens:", response.usage.completion_tokens)
-        print("Response:")
-        print(response.choices[0].message.content)
+    else:
+        print("Agent unable to finish task.")
+        sys.exit(1) #failed to complete desired function within the alloted iterations [20]
+
+    if verbose:
+        print("Prompt tokens:", response.usage.prompt_tokens)
+        print("Response tokens:", response.usage.completion_tokens)
 
 if __name__ == "__main__":
     main()
